@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: auto-myanmar-video-tool
+    runtime: docker
+    plan: free
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: MALE_TTS_VOICE
+        value: onyx
+      - key: FEMALE_TTS_VOICE
+        value: nova
