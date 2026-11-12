@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="my">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Auto Myanmar Video Tool</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0c1020;color:#f5f6fb;font-family:Arial,'Noto Sans Myanmar',sans-serif}
+.wrap{max-width:900px;margin:40px auto;padding:20px}.hero{padding:28px;border:1px solid #29324d;border-radius:22px;background:linear-gradient(135deg,#1a2450,#17172e)}
+h1{margin:0 0 10px;font-size:30px}.muted{color:#aab4d0;line-height:1.7}.panel{margin-top:20px;padding:24px;background:#151b2e;border:1px solid #29324d;border-radius:18px}
+label{display:block;margin:16px 0 8px;color:#dce3fa}input,select{width:100%;padding:14px;border-radius:10px;border:1px solid #394565;background:#0e1425;color:white}
+button{margin-top:20px;padding:14px 22px;border:0;border-radius:11px;background:#7564f5;color:white;font-size:16px;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.5}.result{display:none;margin-top:20px;padding:18px;border-radius:14px;background:#102b25;border:1px solid #23634f}
+a{color:#a9c7ff;display:block;margin:10px 0}.status{margin-top:14px;color:#c5d0ef;white-space:pre-wrap}
+.small{font-size:13px;color:#9ca9c8}
+</style></head>
+<body><main class="wrap">
+<section class="hero"><h1>🎬 Auto Myanmar Video Tool</h1>
+<div class="muted">နိုင်ငံခြားဗီဒီယိုထည့်ပါ။ မြန်မာဘာသာပြန်၊ မြန်မာအသံနဲ့ စာတန်းထိုးပါတဲ့ ဗီဒီယိုကို အလိုအလျောက် ဖန်တီးပါ။</div></section>
+<section class="panel">
+<form id="form">
+<label>ဗီဒီယိုဖိုင် ရွေးပါ (MP4 / MOV / WEBM)</label>
+<input type="file" name="video" accept="video/mp4,video/quicktime,video/webm" required>
+<label>မြန်မာအသံ ရွေးပါ</label>
+<select name="voice_gender"><option value="female">အမျိုးသမီးအသံ</option><option value="male">အမျိုးသားအသံ</option></select>
+<label>စာတန်းထိုးပုံစံ</label>
+<select name="subtitle"><option value="burn">ဗီဒီယိုပေါ်မှာ စာတန်းထိုးမယ်</option><option value="file">SRT ဖိုင် သီးခြားထုတ်မယ်</option></select>
+<button id="submit" type="submit">ဘာသာပြန်ပြီး ဗီဒီယိုဖန်တီးမယ်</button>
+<div class="small">ပထမဆုံး စမ်းသပ်ရာတွင် ၁-၃ မိနစ်စာ ဗီဒီယိုကို အသုံးပြုပါ။</div>
+</form><div class="status" id="status"></div>
+<div class="result" id="result"><b>အောင်မြင်ပါပြီ။</b><div id="links"></div></div>
+</section>
+<p class="small">မှတ်ချက် — ဤသည် စမ်းသပ်အသုံးပြုရန် MVP ဖြစ်သည်။ အသံနှင့် မူရင်းဗီဒီယို အချိန်ကိုက်မှု၊ မြန်မာ TTS အသံအရည်အသွေးနှင့် ရှည်လျားသောဖိုင်များအတွက် ထပ်မံပြုပြင်ရန် လိုနိုင်သည်။</p>
+</main>
+<script>
+const form=document.getElementById('form'), statusBox=document.getElementById('status'), result=document.getElementById('result'), links=document.getElementById('links'), btn=document.getElementById('submit');
+form.addEventListener('submit',async e=>{
+ e.preventDefault(); result.style.display='none'; links.innerHTML=''; btn.disabled=true;
+ statusBox.textContent='ဗီဒီယိုကို တင်နေပြီး AI က စာသားပြောင်း၊ ဘာသာပြန်၊ အသံထုတ်နေပါတယ်။ ဖိုင်အရွယ်အစားပေါ်မူတည်ပြီး အချိန်ယူနိုင်ပါတယ်...';
+ try{
+  const res=await fetch('/api/process',{method:'POST',body:new FormData(form)});
+  const data=await res.json(); if(!res.ok) throw new Error(data.detail||'အမှားဖြစ်နေပါတယ်');
+  statusBox.textContent=data.message+' စာကြောင်း '+data.segments+' ကြောင်း ပြုလုပ်ပြီးပါပြီ။';
+  links.innerHTML=`<a href="${data.video_url}">⬇ မြန်မာအသံ + စာတန်းပါ MP4</a><a href="${data.subtitle_url}">⬇ မြန်မာစာတန်း SRT</a><a href="${data.voice_url}">⬇ မြန်မာအသံ MP3</a>`;
+  result.style.display='block';
+ }catch(err){statusBox.textContent='အမှား: '+err.message}
+ finally{btn.disabled=false}
+});
+</script></body></html>
