@@ -14,8 +14,7 @@ ROOT = Path(__file__).resolve().parent
 WORK = ROOT / "jobs"
 WORK.mkdir(exist_ok=True)
 app = FastAPI(title="Auto Myanmar Video Tool")
-app.mount("/static", StaticFiles(directory=ROOT.parent / "frontend"), name="static")
-
+app.mount("/static", StaticFiles(directory=ROOT), name="static")
 def require_tools():
     if not client:
         raise HTTPException(500, "OPENAI_API_KEY မထည့်ရသေးပါ။ backend/.env ကို စစ်ဆေးပါ။")
